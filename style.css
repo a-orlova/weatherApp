@@ -1,0 +1,79 @@
+@font-face {
+    font-family: "MyFont";
+    src: url("Pixellari.ttf");
+}
+
+* {
+    font-family: "MyFont", sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: url('images/bg.jpg');
+    width: 100%;
+    height: 100dvh;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+body::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100dvh;
+    background: rgb(0, 0, 0, 0.15);
+    backdrop-filter: blur(7px);
+}
+
+.main-container {
+    width: 300px;
+    height: 496px;
+    z-index: 1;
+    background: linear-gradient(
+        to top, rgb(0, 0, 0, 0.15),
+        rgb(255, 255, 255, 0.15)
+    );
+    border: 3px solid #ffffff;
+    backdrop-filter: blur(30px);
+    padding: 20px;
+}
+
+.input-container {
+    position: relative;
+}
+
+.city-input {
+    width: 100%;
+    padding: 10px 16px;
+    border: 3px solid transparent;
+    background: rgb(0, 0, 0, 0.15);
+    outline: none;
+    font-weight: 500;
+    transition: 0.25s border;
+    padding-right: 45px;
+}
+
+.city-input:focus {
+    border: 3px solid rgb(0, 0, 0, 0.15);
+}
+
+.city-input::placeholder {
+    color: rgb(255, 255, 255, 0.75);
+}
+
+.search-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    cursor: pointer;
+    background: none;
+    border: none;
+
+}
