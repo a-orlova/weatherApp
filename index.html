@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>weather app</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="images/icon.ico">
 </head>
 <body>
     <main class="main-container">
@@ -12,6 +13,73 @@
             <input type="text" placeholder="search city" class="city-input">
             <button class="search-btn"><img src="images/search-coding.png" alt="searchBtn"></button>
         </header>
+
+        <section class="weather-info" style="display: none;">
+            <div class="location-date-container">
+                <div class="location">
+                    <img src="images/location.png" alt="location">
+                    <h4 class="country-txt">Russia</h4>
+                </div>
+                <h5 class="current-date-txt regular-txt">Wed, 07 Aug</h5>
+            </div>
+
+            <div class="weather-summary-container">
+                <img src="images/cloudy.png" alt="clouds" class="weather-summary-img">
+                <div class="weather-summary-info">
+                    <h1 class="temp-text">29 °C</h1>
+                    <h3 class="condition-txt regular-txt">Clouds</h3>
+                </div>
+            </div>
+
+            <div class="weather-conditions-container">
+                <div class="condition-item">
+                    <img src="images/drop.png" alt="water drop">
+                    <div class="condition-info">
+                        <h5 class="regular-txt">Humidity</h5>
+                        <h5 class="humidity-value-txt">55%</h5>
+                    </div>
+                </div>
+
+                <div class="condition-item">
+                    <img src="images/wind.png" alt="water drop">
+                    <div class="condition-info">
+                        <h5 class="regular-txt">Wind Speed</h5>
+                        <h5 class="wind-value-txt">2 m/s</h5>
+                    </div>
+                </div>
+            </div>
+
+            <div class="forecast-items-container">
+                <div class="forecast-item">
+                    <h5 class="forecast-item-date regular-txt">05 Aug</h5>
+                    <img src="images/thunderstorm.png" alt="thunderstorm" class="forecast-item-img">
+                    <h5 class="forecast-item-temp">29 °C</h5>
+                </div>
+                <div class="forecast-item">
+                    <h5 class="forecast-item-date regular-txt">05 Aug</h5>
+                    <img src="images/thunderstorm.png" alt="thunderstorm" class="forecast-item-img">
+                    <h5 class="forecast-item-temp">29 °C</h5>
+                </div>
+                <div class="forecast-item">
+                    <h5 class="forecast-item-date regular-txt">05 Aug</h5>
+                    <img src="images/thunderstorm.png" alt="thunderstorm" class="forecast-item-img">
+                    <h5 class="forecast-item-temp">29 °C</h5>
+                </div>
+                <div class="forecast-item">
+                    <h5 class="forecast-item-date regular-txt">05 Aug</h5>
+                    <img src="images/thunderstorm.png" alt="thunderstorm" class="forecast-item-img">
+                    <h5 class="forecast-item-temp">29 °C</h5>
+                </div>
+                <div class="forecast-item">
+                    <h5 class="forecast-item-date regular-txt">05 Aug</h5>
+                    <img src="images/thunderstorm.png" alt="thunderstorm" class="forecast-item-img">
+                    <h5 class="forecast-item-temp">29 °C</h5>
+                </div>
+            </div>
+
+        </section>
+
+        <section class="search-city section-message"></section>
 
     </main>
 </body>
