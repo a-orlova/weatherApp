@@ -19,11 +19,68 @@ const suggestionsList = document.querySelector('.suggestions-list');
 
 const apiKey = '479c8f15d632ca5a2d30ccca7f39d565';
 
+const addCityBtn = document.querySelector('.add-city-btn');
+const savedCitiesBtn = document.querySelector('.saved-cities-btn');
+const savedCitiesList = document.querySelector('.saved-cities-list');
+
+let savedCities = JSON.parse(localStorage.getItem('savedCities')) || [];
+
 let autocompleteEnabled = true;
 
 showDisplaySection(welcomeSection);
 
 setTimeout(requestGeolocation, 500);
+
+function updateAddCityButton(city) {
+    if (savedCities.includes(city)) {
+        addCityBtn.textContent = 'Added';
+        addCityBtn.classList.add('added');
+    } else {
+        addCityBtn.textContent = 'Add City';
+        addCityBtn.classList.remove('added');
+    }
+}
+
+addCityBtn.addEventListener('click', () => {
+    const city = countryTxt.textContent;
+
+    if (!savedCities.includes(city)) {
+        savedCities.push(city);
+    } else {
+        savedCities = savedCities.filter(c => c !== city);
+    }
+
+    localStorage.setItem('savedCities', JSON.stringify(savedCities));
+    updateAddCityButton(city);
+});
+
+savedCitiesBtn.addEventListener('click', () => {
+    if (savedCitiesList.style.display === 'block') {
+        savedCitiesList.style.display = 'none';
+        return;
+    }
+
+    savedCitiesList.innerHTML = '';
+
+    if (savedCities.length === 0) {
+        const li = document.createElement('li');
+        li.textContent = 'No saved cities';
+        savedCitiesList.appendChild(li);
+    } else {
+        savedCities.forEach(city => {
+            const li = document.createElement('li');
+            li.textContent = city;
+            li.addEventListener('click', () => {
+                cityInput.value = city;
+                updateWeatherInfo(city);
+                savedCitiesList.style.display = 'none';
+            });
+            savedCitiesList.appendChild(li);
+        });
+    }
+
+    savedCitiesList.style.display = 'block';
+});
 
 function requestGeolocation() {
     if (!('geolocation' in navigator)) {
@@ -162,6 +219,9 @@ async function updateWeatherInfo(city) {
         fillWeatherData(data);
         await updateForecastsInfo(city);
         showDisplaySection(weatherInfoSection);
+
+        updateAddCityButton(city);
+
     } catch {
         showDisplaySection(notFoundSection);
     }
@@ -221,3 +281,42 @@ function showDisplaySection(section) {
 
     section.style.display = 'flex';
 }
+
+const savedCitiesModal = document.querySelector('.saved-cities-modal');
+const savedCitiesListModal = document.querySelector('.saved-cities-list-modal');
+const closeModalBtn = document.querySelector('.close-modal-btn');
+
+savedCitiesBtn.addEventListener('click', () => {
+    savedCitiesListModal.innerHTML = '';
+
+    if (savedCities.length === 0) {
+        const li = document.createElement('li');
+        li.textContent = 'No saved cities';
+        savedCitiesListModal.appendChild(li);
+    } else {
+        savedCities.forEach(city => {
+            const li = document.createElement('li');
+            li.textContent = city;
+
+            li.addEventListener('click', () => {
+                cityInput.value = city;
+                updateWeatherInfo(city);
+                savedCitiesModal.style.display = 'none';
+            });
+
+            savedCitiesListModal.appendChild(li);
+        });
+    }
+
+    savedCitiesModal.style.display = 'flex';
+});
+
+closeModalBtn.addEventListener('click', () => {
+    savedCitiesModal.style.display = 'none';
+});
+
+savedCitiesModal.addEventListener('click', e => {
+    if (e.target === savedCitiesModal) {
+        savedCitiesModal.style.display = 'none';
+    }
+});
