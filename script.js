@@ -25,20 +25,21 @@ async function fetchCitySuggestions(query) {
     }
 
     try {
-        const url = `https://api.openweathermap.org/geo/1.0/direct?q=${query}&limit=5&appid=${apiKey}`;
-        const response = await fetch(url);
-        const cities = await response.json();
+        const geoUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${query}&limit=7&appid=${apiKey}`;
+        const geoResponse = await fetch(geoUrl);
+        const geoCities = await geoResponse.json();
 
         suggestionsList.innerHTML = '';
 
-        if (!cities.length) {
-            suggestionsList.style.display = 'none';
-            return;
-        }
+        for (const city of geoCities) {
+            const cityName = city.name;
 
-        const uniqueCities = [...new Set(cities.map(c => c.name))];
+            const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}`;
+            const weatherResponse = await fetch(weatherUrl);
+            const weatherData = await weatherResponse.json();
 
-        uniqueCities.forEach(cityName => {
+            if (weatherData.cod !== 200) continue;
+
             const li = document.createElement('li');
             li.textContent = cityName;
 
@@ -49,9 +50,11 @@ async function fetchCitySuggestions(query) {
             });
 
             suggestionsList.appendChild(li);
-        });
+        }
 
-        suggestionsList.style.display = 'block';
+        suggestionsList.style.display =
+            suggestionsList.children.length ? 'block' : 'none';
+
     } catch {
         suggestionsList.style.display = 'none';
     }
