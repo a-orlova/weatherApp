@@ -23,13 +23,42 @@ const addCityBtn = document.querySelector('.add-city-btn');
 const savedCitiesBtn = document.querySelector('.saved-cities-btn');
 const savedCitiesList = document.querySelector('.saved-cities-list');
 
-let savedCities = JSON.parse(localStorage.getItem('savedCities')) || [];
+const refreshBtn = document.querySelector('.refresh-btn');
 
+let currentCity = cityInput.value || null;
+let savedCities = JSON.parse(localStorage.getItem('savedCities')) || [];
 let autocompleteEnabled = true;
 
 showDisplaySection(welcomeSection);
 
 setTimeout(requestGeolocation, 500);
+
+const loadingOverlay = document.querySelector('.loading-overlay');
+
+function showLoading() {
+    loadingOverlay.style.display = 'flex';
+}
+
+function hideLoading() {
+    loadingOverlay.style.display = 'none';
+}
+
+async function refreshWeather() {
+    if (!currentCity) return;
+
+    showLoading();
+    try {
+        await updateWeatherInfo(currentCity);
+    } catch {
+        showDisplaySection(notFoundSection);
+    } finally {
+        hideLoading();
+    }
+}
+
+refreshBtn.addEventListener('click', () => {
+    refreshWeather();
+});
 
 function updateAddCityButton(city) {
     if (savedCities.includes(city)) {
@@ -194,12 +223,8 @@ function getCurrentDate() {
 
 async function loadWeatherByCoords(lat, lon) {
     try {
-        const data = await getFetchData(
-            'weather',
-            `lat=${lat}&lon=${lon}`
-        );
-
-        fillWeatherData(data);
+        const data = await getFetchData('weather', `lat=${lat}&lon=${lon}`);
+        fillWeatherData(data, true);
         await updateForecastsByCoords(lat, lon);
         showDisplaySection(weatherInfoSection);
     } catch {
@@ -208,9 +233,13 @@ async function loadWeatherByCoords(lat, lon) {
 }
 
 async function updateWeatherInfo(city) {
+    currentCity = city;
+    localStorage.setItem('lastCity', currentCity);
+
+    showLoading();
+
     try {
         const data = await getFetchData('weather', `q=${city}`);
-
         if (data.cod !== 200) {
             showDisplaySection(notFoundSection);
             return;
@@ -219,16 +248,18 @@ async function updateWeatherInfo(city) {
         fillWeatherData(data);
         await updateForecastsInfo(city);
         showDisplaySection(weatherInfoSection);
-
         updateAddCityButton(city);
 
     } catch {
         showDisplaySection(notFoundSection);
+    } finally {
+        hideLoading();
     }
 }
 
-function fillWeatherData(data) {
-    countryTxt.textContent = data.name;
+function fillWeatherData(data, isCurrentLocation = false) {
+    countryTxt.textContent = isCurrentLocation ? 'Current location' : data.name;
+
     tempTxt.textContent = Math.round(data.main.temp) + ' °C';
     conditionTxt.textContent = data.weather[0].main;
     humidityValueTxt.textContent = data.main.humidity + '%';
@@ -237,6 +268,7 @@ function fillWeatherData(data) {
     currentDateTxt.textContent = getCurrentDate();
     weatherSummaryImg.src = `images/${getWeatherIcon(data.weather[0].id)}`;
 }
+
 
 async function updateForecastsInfo(city) {
     const data = await getFetchData('forecast', `q=${city}`);
@@ -318,5 +350,12 @@ closeModalBtn.addEventListener('click', () => {
 savedCitiesModal.addEventListener('click', e => {
     if (e.target === savedCitiesModal) {
         savedCitiesModal.style.display = 'none';
+    }
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+    const lastCity = localStorage.getItem('lastCity');
+    if (lastCity) {
+        updateWeatherInfo(lastCity);
     }
 });

@@ -3,6 +3,18 @@
     src: url("Pixellari.ttf");
 }
 
+:root {
+    --font-small: 14px;
+    --font-regular: 16px;
+    --font-large: 22px;
+
+    --icon-small: 30px;
+    --icon-medium: 50px;
+    --icon-large: 120px;
+
+    --forecast-width: 70px;
+}
+
 * {
     font-family: "MyFont", sans-serif;
     margin: 0;
@@ -21,6 +33,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
 }
 
 body::before {
@@ -34,7 +47,7 @@ body::before {
 
 .main-container {
     width: 300px;
-    height: 620px;
+    height: 630px;
     z-index: 1;
     background: linear-gradient(
         to top, rgb(0, 0, 0, 0.15),
@@ -60,7 +73,7 @@ body::before {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: 0.25s border;
+    transition: 0.25s border, 0.25s background;
 }
 
 .refresh-btn:hover, .saved-cities-btn:hover {
@@ -68,8 +81,8 @@ body::before {
 }
 
 .refresh-btn img, .saved-cities-btn img {
-    width: 30px;
-    height: 30px;
+    width: var(--icon-small);
+    height: var(--icon-small);
 }
 
 .input-container {
@@ -84,6 +97,7 @@ body::before {
     background: rgb(0, 0, 0, 0.15);
     outline: none;
     font-weight: 500;
+    font-size: var(--font-regular);
     transition: 0.25s border;
     padding-right: 45px;
 }
@@ -105,7 +119,6 @@ body::before {
     cursor: pointer;
     background: none;
     border: none;
-
 }
 
 .weather-info {
@@ -128,6 +141,7 @@ body::before {
 
 .regular-txt {
     font-weight: 1030;
+    font-size: var(--font-regular);
 }
 
 .weather-summary-container {
@@ -137,8 +151,8 @@ body::before {
 }
 
 .weather-summary-img {
-    width: 120px;
-    height: 120px;
+    width: var(--icon-large);
+    height: var(--icon-large);
 }
 
 .weather-summary-info {
@@ -154,12 +168,13 @@ body::before {
     display: flex;
     align-items: center;
     gap: 6px;
+    font-size: 20px;
 }
 
 .forecast-items-container {
     display: flex;
     gap: 15px;
-    overflow-x: auto; 
+    overflow-x: auto;
     overflow-y: hidden;
     padding-bottom: 12px;
     white-space: nowrap;
@@ -180,15 +195,16 @@ body::before {
 }
 
 .forecast-item {
-    min-width: 70px;
+    min-width: var(--forecast-width);
     background: rgb(255, 255, 255, 0.1);
-    display: flex;  
+    display: flex;
     flex-direction: column;
     gap: 6px;
     padding: 10px;
     align-items: center;
     border-radius: 12px;
     transition: 0.3s background;
+    font-size: 20px;
 }
 
 .forecast-item:hover {
@@ -196,8 +212,24 @@ body::before {
 }
 
 .forecast-item-img {
-    width: 35px;
-    height: 35px;
+    width: var(--icon-medium);
+    height: var(--icon-medium);
+}
+
+.add-city-btn {
+    width: 100%;
+    padding: 10px 0;
+    border: 3px solid transparent;
+    background: rgb(0, 0, 0, 0.15);
+    cursor: pointer;
+    font-size: var(--font-regular);
+    font-weight: 500;
+    transition: 0.25s border, 0.25s background;
+}
+
+.add-city-btn:hover {
+    border: 3px solid rgb(0, 0, 0, 0.15);
+    background: rgb(0, 0, 0, 0.25);
 }
 
 .section-message {
@@ -237,22 +269,6 @@ body::before {
     background: rgba(255, 255, 255, 0.15);
 }
 
-.add-city-btn {
-    width: 100%;
-    padding: 10px 0;
-    border: 3px solid transparent;
-    background: rgb(0, 0, 0, 0.15);
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 500;
-    transition: 0.25s border, 0.25s background;
-}
-
-.add-city-btn:hover {
-    border: 3px solid rgb(0, 0, 0, 0.15);
-    background: rgb(0, 0, 0, 0.25);
-}
-
 .saved-cities-modal {
     position: fixed;
     top: 0;
@@ -267,7 +283,7 @@ body::before {
 }
 
 .saved-cities-modal-content {
-    background: rgb(0,0,0,0.9);
+    background: rgba(0, 0, 0, 0.9);
     padding: 20px;
     width: 280px;
     text-align: center;
@@ -278,7 +294,7 @@ body::before {
 
 .saved-cities-modal-content h3 {
     margin-bottom: 15px;
-    font-size: 18px;
+    font-size: var(--font-large);
 }
 
 .saved-cities-list-modal {
@@ -305,7 +321,7 @@ body::before {
     border: 3px solid transparent;
     background: rgb(0, 0, 0, 0.15);
     cursor: pointer;
-    font-size: 16px;
+    font-size: var(--font-regular);
     font-weight: 500;
     border-radius: 6px;
 }
@@ -313,4 +329,61 @@ body::before {
 .close-modal-btn:hover {
     border: 3px solid rgb(0, 0, 0, 0.15);
     background: rgb(0,0,0,0.25);
+}
+
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: var(--font-large);
+    font-weight: bold;
+    z-index: 50;
+    backdrop-filter: blur(100px);
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+    :root {
+        --font-small: 16px;
+        --font-regular: 20px;
+        --font-large: 28px;
+
+        --icon-small: 40px;
+        --icon-medium: 70px;
+        --icon-large: 150px;
+
+        --forecast-width: 90px;
+    }
+
+    .main-container {
+        width: 500px;
+        height: 720px;
+        padding: 30px;
+    }
+}
+
+@media (min-width: 1025px) {
+    :root {
+        --font-small: 18px;
+        --font-regular: 24px;
+        --font-large: 36px;
+
+        --icon-small: 30px;
+        --icon-medium: 70px;
+        --icon-large: 180px;
+
+        --forecast-width: 110px;
+    }
+
+    .main-container {
+        width: 600px;
+        height: 800px;
+        padding: 40px;
+    }
 }
