@@ -34,7 +34,7 @@ body::before {
 
 .main-container {
     width: 300px;
-    height: 496px;
+    height: 570px;
     z-index: 1;
     background: linear-gradient(
         to top, rgb(0, 0, 0, 0.15),
@@ -43,6 +43,33 @@ body::before {
     border: 3px solid #ffffff;
     backdrop-filter: blur(30px);
     padding: 20px;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.refresh-btn, .saved-cities-btn {
+    width: 48%;
+    padding: 5px;
+    border: 3px solid transparent;
+    background: rgb(0, 0, 0, 0.15);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.25s border;
+}
+
+.refresh-btn:hover, .saved-cities-btn:hover {
+    border: 3px solid rgb(0, 0, 0, 0.15);
+}
+
+.refresh-btn img, .saved-cities-btn img {
+    width: 30px;
+    height: 30px;
 }
 
 .input-container {

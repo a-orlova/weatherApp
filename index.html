@@ -10,10 +10,24 @@
 </head>
 <body>
     <main class="main-container">
+
+        <header class="action-buttons">
+            <button class="refresh-btn" title="refresh weather">
+                <img src="images/refresh.png" alt="Refresh">
+            </button>
+            <button class="saved-cities-btn" title="saved cities">
+                <img src="images/list.png" alt="Saved Cities">
+            </button>
+        </header>
+
         <header class="input-container">
             <input type="text" class="city-input" placeholder="search city">
             <button class="search-btn"><img src="images/search-coding.png" alt="searchBtn"></button>
         </header>
+
+        <div class="autocomplete-container" style="display: none;">
+            <div class="autocomplete-items" id="autocompleteList"></div>
+        </div>       
 
         <section class="weather-info" style="display: none;">
             <div class="location-date-container">
@@ -99,6 +113,17 @@
                 </h4>
             </div>
         </section>
+
+        <div class="modal-overlay" id="citiesModal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Saved Cities</h3>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="cities-list" id="savedCitiesList">
+                </div>
+            </div>
+        </div>        
 
     </main>
 </body>
