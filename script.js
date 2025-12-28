@@ -4,6 +4,7 @@ const searchBtn = document.querySelector('.search-btn');
 const weatherInfoSection = document.querySelector('.weather-info');
 const notFoundSection = document.querySelector('.not-found');
 const searchCitySection = document.querySelector('.search-city');
+
 const countryTxt = document.querySelector('.country-txt');
 const tempTxt = document.querySelector('.temp-text');
 const conditionTxt = document.querySelector('.condition-txt');
@@ -12,23 +13,69 @@ const windValueTxt = document.querySelector('.wind-value-txt');
 const weatherSummaryImg = document.querySelector('.weather-summary-img');
 const currentDateTxt = document.querySelector('.current-date-txt');
 
-const forecastItemsContainer = document.querySelector('.forecast-items-container')
+const forecastItemsContainer = document.querySelector('.forecast-items-container');
+const suggestionsList = document.querySelector('.suggestions-list');
 
 const apiKey = '479c8f15d632ca5a2d30ccca7f39d565';
 
-searchBtn.addEventListener('click', () => {
-    if (cityInput.value.trim() !== '') { 
-        updateWeatherInfo(cityInput.value);
-        cityInput.value = '';
-        cityInput.blur();
+async function fetchCitySuggestions(query) {
+    if (query.length < 2) {
+        suggestionsList.style.display = 'none';
+        return;
     }
+
+    try {
+        const url = `https://api.openweathermap.org/geo/1.0/direct?q=${query}&limit=5&appid=${apiKey}`;
+        const response = await fetch(url);
+        const cities = await response.json();
+
+        suggestionsList.innerHTML = '';
+
+        if (!cities.length) {
+            suggestionsList.style.display = 'none';
+            return;
+        }
+
+        const uniqueCities = [...new Set(cities.map(c => c.name))];
+
+        uniqueCities.forEach(cityName => {
+            const li = document.createElement('li');
+            li.textContent = cityName;
+
+            li.addEventListener('click', () => {
+                cityInput.value = cityName;
+                suggestionsList.style.display = 'none';
+                updateWeatherInfo(cityName);
+            });
+
+            suggestionsList.appendChild(li);
+        });
+
+        suggestionsList.style.display = 'block';
+    } catch {
+        suggestionsList.style.display = 'none';
+    }
+}
+
+cityInput.addEventListener('input', () => {
+    fetchCitySuggestions(cityInput.value.trim());
+});
+
+searchBtn.addEventListener('click', () => {
+    const city = cityInput.value.trim();
+    if (!city) return;
+
+    suggestionsList.style.display = 'none';
+    updateWeatherInfo(city);
 });
 
 cityInput.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter' && cityInput.value.trim() !== '') {
-        updateWeatherInfo(cityInput.value);
-        cityInput.value = '';
-        cityInput.blur();
+    if (event.key === 'Enter') {
+        const city = cityInput.value.trim();
+        if (!city) return;
+
+        suggestionsList.style.display = 'none';
+        updateWeatherInfo(city);
     }
 });
 
@@ -39,112 +86,85 @@ async function getFetchData(endPoint, city) {
 }
 
 function getWeatherIcon(id) {
-    if (id <= 232) return 'thunderstorm.png'
-    if (id <= 321) return 'drizzle.png'
-    if (id <= 531) return 'rain.png'
-    if (id <= 622) return 'snow.png'
-    if (id <= 781) return 'tornado.png'
-    if (id <= 800) return 'clear.png'
-    else return 'clouds.png'
+    if (id <= 232) return 'thunderstorm.png';
+    if (id <= 321) return 'drizzle.png';
+    if (id <= 531) return 'rain.png';
+    if (id <= 622) return 'snow.png';
+    if (id <= 781) return 'tornado.png';
+    if (id <= 800) return 'clear.png';
+    return 'clouds.png';
 }
 
 function getCurrentDate() {
-    const currentDate = new Date()
-    const options = {
+    const date = new Date();
+    return date.toLocaleDateString('en-GB', {
         weekday: 'short',
         day: '2-digit',
         month: 'short'
-    }
-
-    return currentDate.toLocaleDateString('en-GB', options)
+    });
 }
 
 async function updateWeatherInfo(city) {
     try {
         const weatherData = await getFetchData('weather', city);
-        
+
         if (weatherData.cod !== 200) {
             showDisplaySection(notFoundSection);
             return;
         }
 
         const {
-            name: country,
+            name,
             main: { temp, humidity },
             weather: [{ id, main }],
             wind: { speed }
         } = weatherData;
 
-        countryTxt.textContent = country;
+        countryTxt.textContent = name;
         tempTxt.textContent = Math.round(temp) + ' °C';
         conditionTxt.textContent = main;
         humidityValueTxt.textContent = humidity + '%';
-        windValueTxt.textContent = speed + 'm/s';
+        windValueTxt.textContent = speed + ' m/s';
 
-        currentDateTxt.textContent = getCurrentDate()
-        
-        const iconName = getWeatherIcon(id);
-        weatherSummaryImg.src = `images/${iconName}`;
+        currentDateTxt.textContent = getCurrentDate();
+        weatherSummaryImg.src = `images/${getWeatherIcon(id)}`;
 
-        await updateForecastsInfo(city)
+        await updateForecastsInfo(city);
         showDisplaySection(weatherInfoSection);
-    } catch (error) {
-        console.error('Error fetching weather data:', error);
+    } catch {
         showDisplaySection(notFoundSection);
     }
 }
 
 async function updateForecastsInfo(city) {
-    const forecastData = await getFetchData('forecast', city)
+    const forecastData = await getFetchData('forecast', city);
 
-    const timeTaken = '12:00:00'
-    const todayDate = new Date().toISOString().split('T')[0]
+    const today = new Date().toISOString().split('T')[0];
+    forecastItemsContainer.innerHTML = '';
 
-    forecastItemsContainer.innerHTML = ''
-    forecastData.list.forEach(forecastWeather => {
-        if (forecastWeather.dt_txt.includes(timeTaken) &&
-            !forecastWeather.dt_txt.includes(todayDate)) {
-            updateForecastsItems(forecastWeather)
+    forecastData.list.forEach(item => {
+        if (item.dt_txt.includes('12:00:00') && !item.dt_txt.includes(today)) {
+            const date = new Date(item.dt_txt).toLocaleDateString('en-US', {
+                day: '2-digit',
+                month: 'short'
+            });
+
+            forecastItemsContainer.insertAdjacentHTML('beforeend', `
+                <div class="forecast-item">
+                    <h5 class="forecast-item-date regular-txt">${date}</h5>
+                    <img src="images/${getWeatherIcon(item.weather[0].id)}" class="forecast-item-img">
+                    <h5 class="forecast-item-temp">${Math.round(item.main.temp)} °C</h5>
+                </div>
+            `);
         }
-    })
-}
-
-function updateForecastsItems(weatherData) {
-    const {
-        dt_txt: date,
-        weather: [{ id }],
-        main: { temp }
-    } = weatherData
-
-    const dateTaken = new Date(date)
-    const dateOption = {
-        day: '2-digit',
-        month: 'short'
-    }
-
-    const dateResult = dateTaken.toLocaleDateString('en-US', dateOption)
-
-    const forecastItem = `
-        <div class="forecast-item">
-            <h5 class="forecast-item-date regular-txt">${dateResult}</h5>
-            <img src="images/${getWeatherIcon(id)}" alt="thunderstorm" class="forecast-item-img">
-            <h5 class="forecast-item-temp">${Math.round(temp)} °C</h5>
-        </div>
-    `
-
-    forecastItemsContainer.insertAdjacentHTML('beforeend', forecastItem)
+    });
 }
 
 function showDisplaySection(section) {
     weatherInfoSection.style.display = 'none';
     searchCitySection.style.display = 'none';
     notFoundSection.style.display = 'none';
-    
-    if (section === weatherInfoSection) {
-        section.style.display = 'flex';
-    } else if (section === notFoundSection || section === searchCitySection) {
-        section.style.display = 'flex';
-    }
+    section.style.display = 'flex';
 }
 
 showDisplaySection(searchCitySection);
